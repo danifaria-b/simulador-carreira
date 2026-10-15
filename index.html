@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Competências e Valores | Meu Próximo Passo</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      max-width: 650px;
+      width: 100%;
+      padding: 32px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Tela de Login */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-main {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .btn-main:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Questões */
+    .scenario-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    .scenario-desc {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background-color: #eff6ff;
+      transform: translateY(-1px);
+    }
+
+    .option-letter {
+      background: var(--border);
+      color: var(--text);
+      font-weight: 700;
+      border-radius: 6px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .option-btn:hover .option-letter {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Resultados */
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #dbeafe;
+      color: var(--primary-dark);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .student-tag {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .result-title {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .result-desc {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .result-card {
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .result-card h3 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .result-card ul {
+      margin-left: 20px;
+      color: #334155;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .action-box {
+      background: #ecfdf5;
+      border: 1px dashed var(--accent);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    .action-box h4 {
+      color: #065f46;
+      margin-bottom: 6px;
+    }
+
+    .action-box p {
+      color: #047857;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Painel do Professor */
+    .teacher-footer {
+      margin-top: 28px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .teacher-link {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .teacher-link:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- CABEÇALHO -->
+  <div class="header">
+    <h1 id="screen-title">Simulador de Decisão Profissional</h1>
+    <p id="screen-subtitle">Identifique suas forças, valores e papel em equipes de alta performance.</p>
+  </div>
+
+  <div class="progress-bar-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- TELA 1: IDENTIFICAÇÃO DO ALUNO -->
+  <div id="login-block">
+    <div class="input-group">
+      <label for="student-name">Digite seu nome completo para iniciar:</label>
+      <input type="text" id="student-name" placeholder="Ex: Lucas Ferreira de Souza" autocomplete="off" />
+    </div>
+    <button class="btn-main" onclick="startQuiz()">Entrar e Começar Desafio</button>
+  </div>
+
+  <!-- TELA 2: QUESTIONÁRIO -->
+  <div id="quiz-block" style="display: none;">
+    <div class="scenario-title" id="scenario-step">Situação 1 de 5</div>
+    <div class="scenario-desc" id="scenario-text">Carregando situação...</div>
+    <div class="options-list" id="options-container"></div>
+  </div>
+
+  <!-- TELA 3: RESULTADO INDIVIDUAL -->
+  <div id="result-block" style="display: none;">
+    <div class="student-tag" id="res-student-name"></div>
+    <span class="badge">Seu Perfil Predominante</span>
+    <h2 class="result-title" id="res-title">Perfil</h2>
+    <p class="result-desc" id="res-desc"></p>
+
+    <div class="result-card">
+      <h3>🌟 Suas Competências Mais Fortes</h3>
+      <ul id="res-competencies"></ul>
+    </div>
+
+    <div class="result-card">
+      <h3>💎 Seus Valores Centrais de Trabalho</h3>
+      <ul id="res-values"></ul>
+    </div>
+
+    <div class="action-box">
+      <h4>Conexão com seu Plano de Desenvolvimento:</h4>
+      <p id="res-pdp-tip"></p>
+    </div>
+
+    <button class="btn-main" style="margin-top: 24px;" onclick="location.reload()">Finalizar e Sair</button>
+  </div>
+
+  <!-- TELA 4: PAINEL DO PROFESSOR (ACESSO RESTRITO) -->
+  <div id="teacher-block" style="display: none;">
+    <h2 style="font-size: 1.3rem; margin-bottom: 12px;">Relatório de Entregas da Turma</h2>
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+      Registros armazenados localmente neste dispositivo:
+    </p>
+
+    <div style="overflow-x: auto;">
+      <table id="teacher-table">
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>Perfil Identificado</th>
+            <th>Data/Hora</th>
+          </tr>
+        </thead>
+        <tbody id="teacher-tbody"></tbody>
+      </table>
+    </div>
+
+    <button class="btn-main" style="margin-top: 16px;" onclick="exportToCSV()">Baixar Tabela (CSV / Excel)</button>
+    <button class="btn-main" style="margin-top: 8px; background: #64748b;" onclick="closeTeacherPanel()">Voltar ao Início</button>
+  </div>
+
+  <!-- RODAPÉ DISCRETO DO PROFESSOR -->
+  <div class="teacher-footer">
+    <span class="teacher-link" onclick="openTeacherLogin()">Área do Professor</span>
+  </div>
+</div>
+
+<script>
+  // COLOQUE AQUI A URL DO SEU GOOGLE APPS SCRIPT (SE DESEJAR RECEBER DIRETO NA SUA PLANILHA GOOGLE)
+  const GOOGLE_SCRIPT_URL = ""; 
+
+  let currentStudent = "";
+  let currentIdx = 0;
+  let scores = { estrategista: 0, conector: 0, inovador: 0, criativo: 0 };
+
+  const scenarios = [
+    {
+      step: "Dilema 1 de 5",
+      text: "Sua equipe precisa entregar um projeto urgente às 17h, mas descobriu que há erros nos relatórios e desentendimentos entre dois colegas sobre quem errou. O que você faz primeiro?",
+      options: [
+        { text: "Converso reservadamente com os dois colegas para acalmar os ânimos e restaurar a colaboração.", type: "conector" },
+        { text: "Assumo o comando imediato, divido as tarefas restantes e foco em entregar o que dá tempo.", type: "inovador" },
+        { text: "Abro a planilha/relatório, analiso a origem exata do erro e recalculo os dados corretos.", type: "estrategista" },
+        { text: "Proponho uma forma alternativa e criativa de apresentar a entrega para contornar a falha.", type: "criativo" }
+      ]
+    },
+    {
+      step: "Dilema 2 de 5",
+      text: "Ao iniciar em um novo setor da empresa, você nota que as pessoas usam processos manuais demorados e desorganizados. Qual é o seu impulso natural?",
+      options: [
+        { text: "Mapear o fluxo completo em um checklist detalhado e estruturar um passo a passo padronizado.", type: "estrategista" },
+        { text: "Pensar em um aplicativo, ferramenta visual ou ideia inédita que mude completamente o jeito de fazer aquilo.", type: "criativo" },
+        { text: "Conversar com quem trabalha lá há mais tempo para entender como se sentem antes de sugerir mudanças.", type: "conector" },
+        { text: "Testar uma solução rápida por conta própria e mostrar o resultado prático para o gestor.", type: "inovador" }
+      ]
+    },
+    {
+      step: "Dilema 3 de 5",
+      text: "Em uma reunião de planejamento, qual tipo de contribuição você mais se orgulha de oferecer?",
+      options: [
+        { text: "Ideias originais fora do padrão que ninguém havia considerado ainda.", type: "criativo" },
+        { text: "Previsão de riscos, prazos realistas e verificação se temos dados concretos para avançar.", type: "estrategista" },
+        { text: "Apoio para que todos consigam expressar suas opiniões e manter o clima agradável.", type: "conector" },
+        { text: "Direcionamento prático: 'Chega de falar, vamos definir quem faz o quê e começar agora'.", type: "inovador" }
+      ]
+    },
+    {
+      step: "Dilema 4 de 5",
+      text: "Qual situação no ambiente de trabalho causaria mais desconforto a você?",
+      options: [
+        { text: "Ambiente com brigas constantes, falta de empatia e competição predatória.", type: "conector" },
+        { text: "Trabalho engessado, monótono, sem espaço para sugerir novidades.", type: "criativo" },
+        { text: "Desorganização total, falta de método e regras que mudam a todo minuto sem explicação.", type: "estrategista" },
+        { text: "Lentidão excessiva para tomar decisões simples e falta de foco em resultados.", type: "inovador" }
+      ]
+    },
+    {
+      step: "Dilema 5 de 5",
+      text: "Quando você pensa no seu futuro profissional a médio prazo, o que mais brilha nos seus olhos?",
+      options: [
+        { text: "Ser reconhecido como um profissional de alta precisão técnica e confiança analítica.", type: "estrategista" },
+        { text: "Estar em uma posição dinâmica, liderando desafios e resolvendo problemas com autonomia.", type: "inovador" },
+        { text: "Desenvolver pessoas, construir comunidades fortes e promover um clima acolhedor.", type: "conector" },
+        { text: "Criar marcas, conceitos, projetos originais ou modelos que transformem a realidade.", type: "criativo" }
+      ]
+    }
+  ];
+
+  const profiles = {
+    estrategista: {
+      title: "Estrategista Analítico",
+      desc: "Você possui uma mente focada na precisão, na clareza dos processos e na estruturação lógica. Prefere entender as regras do jogo e tomar decisões com base em dados concretos, evitando o improviso desordenado.",
+      competencies: [
+        "Planejamento tático e visão de processos",
+        "Atenção rigorosa a detalhes e conformidade",
+        "Raciocínio lógico e análise de dados",
+        "Gestão de tempo e cumprimento de prazos"
+      ],
+      values: ["Eficiência e organização", "Segurança e previsibilidade", "Melhoria contínua e qualidade técnica"],
+      tip: "Use essa precisão no seu plano para blindar sua rotina de metas. Cuidado apenas com o perfeccionismo excessivo; pratique o 'feito é melhor que perfeito' quando os prazos apertarem."
+    },
+    conector: {
+      title: "Conector Relacional",
+      desc: "Sua inteligência se manifesta nas relações humanas. Você compreende dinâmicas interpessoais com facilidade, ouve com sensibilidade e sabe como criar pontes entre colegas em momentos de tensão.",
+      competencies: [
+        "Comunicação empática e escuta ativa",
+        "Mediação de conflitos e negociação",
+        "Trabalho colaborativo e integração de equipes",
+        "Inteligência socioemocional apurada"
+      ],
+      values: ["Confiança mútua e respeito", "Cooperação e senso de comunidade", "Harmonia e bem-estar coletivo"],
+      tip: "No seu plano de metas, posicione-se em papéis de liderança humanizada, projetos de equipe e atendimento. Lembre-se de definir limites claros para não se sobrecarregar com os problemas alheios."
+    },
+    inovador: {
+      title: "Inovador Executor",
+      desc: "Você é movido a desafios, velocidade e realizações palpáveis. Enquanto outros ainda discutem teorias, você já está testando a primeira solução no chão de fábrica ou no atendimento.",
+      competencies: [
+        "Iniciativa rápida e protagonismo",
+        "Tomada de decisão sob pressão",
+        "Orientação firme para metas e entregas",
+        "Resiliência e capacidade de adaptação"
+      ],
+      values: ["Autonomia e liberdade de ação", "Superação e meritocracia", "Agilidade e eficácia"],
+      tip: "Seu plano deve conter metas agressivas de curto prazo para manter seu ritmo ativo. Treine a paciência com colegas que têm ritmos de análise mais lentos que o seu."
+    },
+    criativo: {
+      title: "Criativo Visionário",
+      desc: "Sua marca é enxergar possibilidades onde a maioria só enxerga rotina. Você questiona o 'sempre foi feito assim' e busca constantemente formas novas, autênticas e inspiradoras de realizar o trabalho.",
+      competencies: [
+        "Pensamento crítico e imaginação prática",
+        "Comunicação persuasiva e storytelling",
+        "Geração de ideias e solução criativa de problemas",
+        "Visão integrada de cenários futuros"
+      ],
+      values: ["Originalidade e autenticidade", "Propósito e impacto social/institucional", "Flexibilidade e experimentação"],
+      tip: "Ancore sua criatividade em ferramentas de organização (como cronogramas e checklists) para garantir que suas grandes ideias sempre cheguem à fase de conclusão."
+    }
+  };
+
+  function startQuiz() {
+    const nameInput = document.getElementById("student-name").value.trim();
+    if (!nameInput) {
+      alert("Por favor, digite seu nome completo para começar.");
+      return;
+    }
+    currentStudent = nameInput;
+    document.getElementById("login-block").style.display = "none";
+    document.getElementById("quiz-block").style.display = "block";
+    document.getElementById("progress-container").style.display = "block";
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const total = scenarios.length;
+    const progress = (currentIdx / total) * 100;
+    document.getElementById("progress-bar").style.width = progress + "%";
+
+    const q = scenarios[currentIdx];
+    document.getElementById("scenario-step").textContent = q.step;
+    document.getElementById("scenario-text").textContent = q.text;
+
+    const container = document.getElementById("options-container");
+    container.innerHTML = "";
+
+    const letters = ["A", "B", "C", "D"];
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.onclick = () => selectOption(opt.type);
+      btn.innerHTML = `
+        <span class="option-letter">${letters[idx]}</span>
+        <span>${opt.text}</span>
+      `;
+      container.appendChild(btn);
+    });
+  }
+
+  function selectOption(type) {
+    scores[type]++;
+    currentIdx++;
+
+    if (currentIdx < scenarios.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById("progress-bar").style.width = "100%";
+    document.getElementById("quiz-block").style.display = "none";
+    document.getElementById("progress-container").style.display = "none";
+    document.getElementById("screen-title").textContent = "Resultado da Análise";
+    document.getElementById("screen-subtitle").textContent = "Veja o mapa de competências gerado pelas suas decisões:";
+
+    let winner = Object.keys(scores).reduce((a, b) => scores[a] >= scores[b] ? a : b);
+    const data = profiles[winner];
+
+    document.getElementById("res-student-name").textContent = "Aprendiz: " + currentStudent;
+    document.getElementById("res-title").textContent = data.title;
+    document.getElementById("res-desc").textContent = data.desc;
+
+    const compList = document.getElementById("res-competencies");
+    compList.innerHTML = "";
+    data.competencies.forEach(c => {
+      const li = document.createElement("li");
+      li.textContent = c;
+      compList.appendChild(li);
+    });
+
+    const valList = document.getElementById("res-values");
+    valList.innerHTML = "";
+    data.values.forEach(v => {
+      const li = document.createElement("li");
+      li.textContent = v;
+      valList.appendChild(li);
+    });
+
+    document.getElementById("res-pdp-tip").textContent = data.tip;
+    document.getElementById("result-block").style.display = "block";
+
+    // 1. Salva no Armazenamento Local (Memória do Navegador)
+    saveSubmissionLocally(currentStudent, data.title, data.competencies.join(", "), data.values.join(", "));
+
+    // 2. Se configurado, envia para o Google Sheets
+    if (GOOGLE_SCRIPT_URL) {
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: currentStudent,
+          perfil: data.title,
+          competencias: data.competencies.join("; "),
+          valores: data.values.join("; ")
+        })
+      }).catch(err => console.log("Aviso: integração de envio silencioso."));
+    }
+  }
+
+  function saveSubmissionLocally(name, profile, comps, vals) {
+    let history = JSON.parse(localStorage.getItem("quiz_submissions") || "[]");
+    history.push({
+      nome: name,
+      perfil: profile,
+      competencias: comps,
+      valores: vals,
+      data: new Date().toLocaleString("pt-BR")
+    });
+    localStorage.setItem("quiz_submissions", JSON.stringify(history));
+  }
+
+  // Funções do Painel do Professor
+  function openTeacherLogin() {
+    const pass = prompt("Digite a senha de acesso docente:");
+    if (pass === "admin123") {
+      document.getElementById("login-block").style.display = "none";
+      document.getElementById("quiz-block").style.display = "none";
+      document.getElementById("result-block").style.display = "none";
+      document.getElementById("progress-container").style.display = "none";
+      document.getElementById("teacher-block").style.display = "block";
+      document.getElementById("screen-title").textContent = "Painel Docente";
+      document.getElementById("screen-subtitle").textContent = "Controle de participação e perfis diagnosticados.";
+      loadTeacherTable();
+    } else if (pass !== null) {
+      alert("Senha incorreta.");
+    }
+  }
+
+  function loadTeacherTable() {
+    const list = JSON.parse(localStorage.getItem("quiz_submissions") || "[]");
+    const tbody = document.getElementById("teacher-tbody");
+    tbody.innerHTML = "";
+
+    if (list.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Nenhum aluno respondeu neste navegador ainda.</td></tr>";
+      return;
+    }
+
+    list.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><strong>${item.nome}</strong></td>
+        <td>${item.perfil}</td>
+        <td>${item.data}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function closeTeacherPanel() {
+    document.getElementById("teacher-block").style.display = "none";
+    document.getElementById("login-block").style.display = "block";
+    document.getElementById("screen-title").textContent = "Simulador de Decisão Profissional";
+    document.getElementById("screen-subtitle").textContent = "Identifique suas forças, valores e papel em equipes de alta performance.";
+  }
+
+  function exportToCSV() {
+    const list = JSON.parse(localStorage.getItem("quiz_submissions") || "[]");
+    if (list.length === 0) {
+      alert("Não há dados registrados para exportar.");
+      return;
+    }
+
+    let csv = "\uFEFFNome,Perfil,Data\n";
+    list.forEach(i => {
+      csv += `"${i.nome}","${i.perfil}","${i.data}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "respostas_simulador_turma.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>
